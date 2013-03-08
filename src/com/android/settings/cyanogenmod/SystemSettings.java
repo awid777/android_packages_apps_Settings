@@ -52,12 +52,12 @@ public class SystemSettings extends SettingsPreferenceFragment  implements
     private static final String KEY_EXPANDED_DESKTOP_NO_NAVBAR = "expanded_desktop_no_navbar";
     private static final String PREF_DISABLE_FULLSCREEN_KEYBOARD = "disable_fullscreen_keyboard";            
 
+
     private PreferenceScreen mNotificationPulse;
     private PreferenceScreen mBatteryPulse;
     private ListPreference mExpandedDesktopPref;
     private CheckBoxPreference mExpandedDesktopNoNavbarPref;
     private CheckBoxPreference mDisableFullscreenKeyboard;            
-            
 
     private boolean mIsPrimary;
 
@@ -154,6 +154,7 @@ public class SystemSettings extends SettingsPreferenceFragment  implements
         mDisableFullscreenKeyboard = (CheckBoxPreference) findPreference(PREF_DISABLE_FULLSCREEN_KEYBOARD);
         mDisableFullscreenKeyboard.setOnPreferenceChangeListener(this);
         mDisableFullscreenKeyboard.setChecked(statusDisableFullscreenKeyboard > 0);
+
     }
 
     @Override

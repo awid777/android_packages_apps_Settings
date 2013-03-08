@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2010 The Android Open Source Project
  *
@@ -78,7 +79,9 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
     private static final String KEY_WAKEUP_WHEN_PLUGGED_UNPLUGGED = "wakeup_when_plugged_unplugged";
     private static final String KEY_RECENTS_RAM_BAR = "recents_ram_bar";
     private static final String PREF_HIDE_EXTRAS = "hide_extras";        
-    private static final String KEY_WE_WANT_POPUPS = "show_popup";
+    private static final String KEY_WE_WANT_POPUPS = "show_popup";            
+    private static final String KEY_MMS_BREATH = "mms_breath";
+    private static final String KEY_MISSED_CALL_BREATH = "missed_call_breath";
             
     // Strings used for building the summary
     private static final String ROTATION_ANGLE_0 = "0";
@@ -103,6 +106,8 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
     private PreferenceScreen mDisplayRotationPreference;
     private WarnedListPreference mFontSizePref;
     private CheckBoxPreference mWeWantPopups;
+    private CheckBoxPreference mMMSBreath;
+    private CheckBoxPreference mMissedCallBreath;
 
     private final Configuration mCurConfig = new Configuration();
 
@@ -223,7 +228,16 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
 	
         mRamBar = findPreference(KEY_RECENTS_RAM_BAR);
         updateRamBar();
-      
+
+        int statusMMSBreath = Settings.System.getInt(getContentResolver(), Settings.System.MMS_BREATH, 1);
+        mMMSBreath = (CheckBoxPreference) findPreference(KEY_MMS_BREATH);
+        mMMSBreath.setOnPreferenceChangeListener(this);
+        mMMSBreath.setChecked(statusMMSBreath > 0);
+
+        int statusMissedCallBreath = Settings.System.getInt(getContentResolver(), Settings.System.MISSED_CALL_BREATH, 1);
+        mMissedCallBreath = (CheckBoxPreference) findPreference(KEY_MISSED_CALL_BREATH);
+        mMissedCallBreath.setOnPreferenceChangeListener(this);
+        mMissedCallBreath.setChecked(statusMissedCallBreath > 0);
     }
 
     private void updateDisplayRotationPreferenceDescription() {
@@ -564,6 +578,16 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
             boolean checked = (Boolean) objValue;
                         Settings.System.putBoolean(getActivity().getContentResolver(),
                                 Settings.System.WE_WANT_POPUPS, checked);
+            return true;
+        } else if (preference == mMMSBreath) {
+            boolean checked = (Boolean) objValue;
+            Settings.System.putBoolean(getActivity().getContentResolver(),
+                Settings.System.MMS_BREATH, checked);
+            return true;
+        } else if (preference == mMissedCallBreath) {
+            boolean checked = (Boolean) objValue;
+            Settings.System.putBoolean(getActivity().getContentResolver(),
+                Settings.System.MISSED_CALL_BREATH, checked);
             return true;
         }
 	    return true;
