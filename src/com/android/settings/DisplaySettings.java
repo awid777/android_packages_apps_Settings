@@ -78,6 +78,8 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
     private static final String KEY_WAKEUP_WHEN_PLUGGED_UNPLUGGED = "wakeup_when_plugged_unplugged";
     private static final String KEY_RECENTS_RAM_BAR = "recents_ram_bar";
     private static final String PREF_HIDE_EXTRAS = "hide_extras";        
+    private static final String KEY_SCREEN_OFF_ANIMATION = "screen_off_animation";
+
 
     // Strings used for building the summary
     private static final String ROTATION_ANGLE_0 = "0";
@@ -111,6 +113,7 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
     private Preference mWifiDisplayPreference;
 
     private String mCustomLabelText = null;
+    private CheckBoxPreference mScreenOffAnimation;
 
     private ContentObserver mAccelerometerRotationObserver =
             new ContentObserver(new Handler()) {
@@ -216,6 +219,14 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
         mRamBar = findPreference(KEY_RECENTS_RAM_BAR);
         updateRamBar();
       
+        mScreenOffAnimation = (CheckBoxPreference) findPreference(KEY_SCREEN_OFF_ANIMATION);
+        if(getResources().getBoolean(com.android.internal.R.bool.config_screenOffAnimation)) {
+            mScreenOffAnimation.setChecked(Settings.System.getInt(resolver,
+                    Settings.System.SCREEN_OFF_ANIMATION, 1) == 1);
+        } else {
+            getPreferenceScreen().removePreference(mScreenOffAnimation);
+        }
+
     }
 
     private void updateDisplayRotationPreferenceDescription() {
@@ -521,6 +532,10 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
             });
 
             alert.show();
+        } else if (preference == mScreenOffAnimation) {
+            Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_ANIMATION,
+                    mScreenOffAnimation.isChecked() ? 1 : 0);
+            return true;
         }
 
         return super.onPreferenceTreeClick(preferenceScreen, preference);
