@@ -48,13 +48,11 @@ public class SystemSettings extends SettingsPreferenceFragment  implements
     private static final String KEY_QUICK_SETTINGS = "quick_settings_panel";
     private static final String KEY_NOTIFICATION_DRAWER = "notification_drawer";
     private static final String KEY_POWER_MENU = "power_menu";
-    private static final String KEY_PIE_CONTROL = "pie_control";
     private static final String KEY_EXPANDED_DESKTOP = "expanded_desktop";
     private static final String KEY_EXPANDED_DESKTOP_NO_NAVBAR = "expanded_desktop_no_navbar";
 
     private PreferenceScreen mNotificationPulse;
     private PreferenceScreen mBatteryPulse;
-    private PreferenceScreen mPieControl;
     private ListPreference mExpandedDesktopPref;
     private CheckBoxPreference mExpandedDesktopNoNavbarPref;
 
@@ -67,11 +65,6 @@ public class SystemSettings extends SettingsPreferenceFragment  implements
         addPreferencesFromResource(R.xml.system_settings);
         PreferenceScreen prefScreen = getPreferenceScreen();
 
-        // Only show the hardware keys config on a device that does have them
-        // and the navigation bar config when we're not in tabletui
-        boolean removeKeys = !getResources().getBoolean(
-                    com.android.internal.R.bool.config_hasHardwareKeys);
-
         // Determine which user is logged in
         mIsPrimary = UserHandle.myUserId() == UserHandle.USER_OWNER;
         if (mIsPrimary) {
@@ -82,10 +75,24 @@ public class SystemSettings extends SettingsPreferenceFragment  implements
                 if (getResources().getBoolean(
                         com.android.internal.R.bool.config_intrusiveBatteryLed) == false) {
                     prefScreen.removePreference(mBatteryPulse);
-                } else {
-                    updateBatteryPulseDescription();
                     mBatteryPulse = null;
                 }
+            }
+
+            // Only show the hardware keys config on a device that does not have a navbar
+            // and the navigation bar config on phones that has a navigation bar
+            boolean removeKeys = false;
+            boolean removeNavbar = false;
+            IWindowManager windowManager = IWindowManager.Stub.asInterface(
+                    ServiceManager.getService(Context.WINDOW_SERVICE));
+            try {
+                if (windowManager.hasNavigationBar()) {
+                    removeKeys = true;
+                } else {
+                    removeNavbar = true;
+                }
+            } catch (RemoteException e) {
+                // Do nothing
             }
 
             // Act on the above
@@ -108,12 +115,11 @@ public class SystemSettings extends SettingsPreferenceFragment  implements
         if (mNotificationPulse != null) {
             if (!getResources().getBoolean(com.android.internal.R.bool.config_intrusiveNotificationLed)) {
                 prefScreen.removePreference(mNotificationPulse);
-                mNotificationPulse = null;
+            } else {
+                updateLightPulseDescription();
             }
         }
 
-        // Pie controls
-        mPieControl = (PreferenceScreen) findPreference(KEY_PIE_CONTROL);
 
         // Expanded desktop
         mExpandedDesktopPref = (ListPreference) findPreference(KEY_EXPANDED_DESKTOP);
@@ -137,7 +143,6 @@ public class SystemSettings extends SettingsPreferenceFragment  implements
         } catch (RemoteException e) {
             Log.e(TAG, "Error getting navigation bar status");
         }
-
         // Don't display the lock clock preference if its not installed
         removePreferenceIfPackageNotInstalled(findPreference(KEY_LOCK_CLOCK));
     }
@@ -149,9 +154,6 @@ public class SystemSettings extends SettingsPreferenceFragment  implements
         // All users
         if (mNotificationPulse != null) {
             updateLightPulseDescription();
-        }
-        if (mPieControl != null) {
-            updatePieControlDescription();
         }
 
         // Primary user only
@@ -197,14 +199,6 @@ public class SystemSettings extends SettingsPreferenceFragment  implements
         }
      }
 
-    private void updatePieControlDescription() {
-        if (Settings.System.getInt(getActivity().getContentResolver(),
-                Settings.System.PIE_CONTROLS, 0) == 1) {
-            mPieControl.setSummary(getString(R.string.pie_control_enabled));
-        } else {
-            mPieControl.setSummary(getString(R.string.pie_control_disabled));
-        }
-    }
 
     private void updateExpandedDesktop(int value) {
         ContentResolver cr = getContentResolver();
@@ -224,10 +218,6 @@ public class SystemSettings extends SettingsPreferenceFragment  implements
         } else if (value == 2) {
             Settings.System.putInt(cr, Settings.System.POWER_MENU_EXPANDED_DESKTOP_ENABLED, 1);
             summary = R.string.expanded_desktop_no_status_bar;
-        }
-
-        if (mExpandedDesktopPref != null && summary != -1) {
-            mExpandedDesktopPref.setSummary(res.getString(summary));
         }
     }
 }
