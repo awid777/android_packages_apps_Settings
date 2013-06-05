@@ -50,11 +50,14 @@ public class SystemSettings extends SettingsPreferenceFragment  implements
     private static final String KEY_POWER_MENU = "power_menu";
     private static final String KEY_EXPANDED_DESKTOP = "expanded_desktop";
     private static final String KEY_EXPANDED_DESKTOP_NO_NAVBAR = "expanded_desktop_no_navbar";
+    private static final String PREF_DISABLE_FULLSCREEN_KEYBOARD = "disable_fullscreen_keyboard";            
 
     private PreferenceScreen mNotificationPulse;
     private PreferenceScreen mBatteryPulse;
     private ListPreference mExpandedDesktopPref;
     private CheckBoxPreference mExpandedDesktopNoNavbarPref;
+    private CheckBoxPreference mDisableFullscreenKeyboard;            
+            
 
     private boolean mIsPrimary;
 
@@ -145,6 +148,12 @@ public class SystemSettings extends SettingsPreferenceFragment  implements
         }
         // Don't display the lock clock preference if its not installed
         removePreferenceIfPackageNotInstalled(findPreference(KEY_LOCK_CLOCK));
+        
+        int statusDisableFullscreenKeyboard = Settings.System.getInt(getContentResolver(), Settings.System.PREF_DISABLE_FULLSCREEN_KEYBOARD, 1);
+        
+        mDisableFullscreenKeyboard = (CheckBoxPreference) findPreference(PREF_DISABLE_FULLSCREEN_KEYBOARD);
+        mDisableFullscreenKeyboard.setOnPreferenceChangeListener(this);
+        mDisableFullscreenKeyboard.setChecked(statusDisableFullscreenKeyboard > 0);
     }
 
     @Override
@@ -175,6 +184,11 @@ public class SystemSettings extends SettingsPreferenceFragment  implements
         } else if (preference == mExpandedDesktopNoNavbarPref) {
             boolean value = (Boolean) objValue;
             updateExpandedDesktop(value ? 2 : 0);
+            return true;
+        } else if (preference == mDisableFullscreenKeyboard) {
+            boolean checked = (Boolean) objValue;
+            Settings.System.putBoolean(getActivity().getApplicationContect().getContentResolver(),
+                    Settings.System.DISABLE_FULLSCREEN_KEYBOARD, checked);
             return true;
         }
 
