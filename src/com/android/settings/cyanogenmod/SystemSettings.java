@@ -149,7 +149,7 @@ public class SystemSettings extends SettingsPreferenceFragment  implements
         // Don't display the lock clock preference if its not installed
         removePreferenceIfPackageNotInstalled(findPreference(KEY_LOCK_CLOCK));
         
-        int statusDisableFullscreenKeyboard = Settings.System.getInt(getContentResolver(), Settings.System.PREF_DISABLE_FULLSCREEN_KEYBOARD, 1);
+        int statusDisableFullscreenKeyboard = Settings.System.getInt(getContentResolver(), Settings.System.disable_fullscreen_keyboard, 1);
         
         mDisableFullscreenKeyboard = (CheckBoxPreference) findPreference(PREF_DISABLE_FULLSCREEN_KEYBOARD);
         mDisableFullscreenKeyboard.setOnPreferenceChangeListener(this);
@@ -187,7 +187,7 @@ public class SystemSettings extends SettingsPreferenceFragment  implements
             return true;
         } else if (preference == mDisableFullscreenKeyboard) {
             boolean checked = (Boolean) objValue;
-            Settings.System.putBoolean(getActivity().getApplicationContect().getContentResolver(),
+            Settings.System.putBoolean(getActivity().getContentResolver(),
                     Settings.System.DISABLE_FULLSCREEN_KEYBOARD, checked);
             return true;
         }
