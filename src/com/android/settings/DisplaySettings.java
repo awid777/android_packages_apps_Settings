@@ -78,7 +78,8 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
     private static final String KEY_WAKEUP_WHEN_PLUGGED_UNPLUGGED = "wakeup_when_plugged_unplugged";
     private static final String KEY_RECENTS_RAM_BAR = "recents_ram_bar";
     private static final String PREF_HIDE_EXTRAS = "hide_extras";        
-
+    private static final String KEY_WE_WANT_POPUPS = "show_popup";
+            
     // Strings used for building the summary
     private static final String ROTATION_ANGLE_0 = "0";
     private static final String ROTATION_ANGLE_90 = "90";
@@ -101,6 +102,7 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
     private Preference mRamBar;
     private PreferenceScreen mDisplayRotationPreference;
     private WarnedListPreference mFontSizePref;
+    private CheckBoxPreference mWeWantPopups;
 
     private final Configuration mCurConfig = new Configuration();
 
@@ -208,6 +210,12 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
         mNotificationsBehavior.setValue(String.valueOf(CurrentBehavior));
         mNotificationsBehavior.setSummary(mNotificationsBehavior.getEntry());
         mNotificationsBehavior.setOnPreferenceChangeListener(this);
+
+        int showPopups = Settings.System.getInt(getContentResolver(), Settings.System.WE_WANT_POPUPS, 1);
+
+        mWeWantPopups = (CheckBoxPreference) findPreference(KEY_WE_WANT_POPUPS);
+        mWeWantPopups.setOnPreferenceChangeListener(this);
+        mWeWantPopups.setChecked(showPopups > 0);
 
 	    mWakeUpWhenPluggedOrUnplugged = (CheckBoxPreference) findPreference(KEY_WAKEUP_WHEN_PLUGGED_UNPLUGGED);
         mWakeUpWhenPluggedOrUnplugged.setChecked(Settings.System.getInt(getActivity().getContentResolver(),
@@ -552,9 +560,14 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
             int index = mNotificationsBehavior.findIndexOfValue(val);
             mNotificationsBehavior.setSummary(mNotificationsBehavior.getEntries()[index]);
             return true;
-        }    
+        } if (preference == mWeWantPopups) {
+            boolean checked = (Boolean) objValue;
+                        Settings.System.putBoolean(getActivity().getContentResolver(),
+                                Settings.System.WE_WANT_POPUPS, checked);
+            return true;
+        }
 	    return true;
-              		
+
     }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {

@@ -72,6 +72,13 @@
         <PreferenceCategory
             android:key="category_beerdisplay_options"
             android:title="@string/display_category_beerdisplay_options_title"/>
+    
+    
+        <CheckBoxPreference
+            android:key="show_popup"
+            android:title="@string/popups_title"
+            android:summary="@string/popups_summary"
+            android:defaultValue="true" />
 
         <CheckBoxPreference
              android:key="use_alt_resolver"
