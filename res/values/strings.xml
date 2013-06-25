@@ -4701,7 +4701,11 @@
     <string name="ram_bar_color_disabled">Disabled</string>
     <string name="ram_bar_button_help">Help</string>
     <string name="ram_bar_button_reset">Reset colors</string>
-    
+
+    <!-- Auto-Hide Status Bar -->
+    <string name="auto_hide_statusbar">Auto Hide statusbar</string>
+    <string name="auto_hide_statusbar_summary">Statusbar hides itself when there are no notifications</string>
+
     <!-- TabUI Extras Hide -->
     <string name="hide_extras">Hide extras</string>
     <string name="hide_extras_summary">Hides extra buttons in tabUI (requires UI restart)</string>
