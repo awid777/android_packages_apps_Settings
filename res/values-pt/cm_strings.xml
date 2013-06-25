@@ -685,4 +685,34 @@ controle adicionais. \'Remover\' apaga a linha selecionada.
     </string>
     <string name="volume_keys_control_ring_stream">Botões de volume controlam o volume do toque</string>
     <string name="icon_picker_contacts">Contatos</string>
+    <string name="auto_brightness_sensitivity_title">Ajuste de sensitividade</string>
+    <string name="auto_brightness_sensitivity_verylow">Muito baixa</string>
+    <string name="auto_brightness_sensitivity_low">Baixa</string>
+    <string name="auto_brightness_sensitivity_medium">Média</string>
+    <string name="auto_brightness_sensitivity_high">Alta</string>
+    <string name="auto_brightness_sensitivity_veryhigh">Muito alta</string>
+    <string name="pie_control_sensitivity_title">Responsividade</string>
+    <string name="pie_control_sensitivity_low">Baixa</string>
+    <string name="pie_control_sensitivity_medium">Média</string>
+    <string name="pie_control_sensitivity_high">Alta</string>
+    <string name="pie_control_sensitivity_very_high">Muito alta</string>
+    <string name="screen_off_animation_title">Animação ao desligar a tela</string>
+    <string name="screen_off_animation_summary">Mostrar a animação feixe de elétrons quando a tela é desligada</string>
+    <string name="confirm_delete_apn">O APN vai ser removido.</string>
+    <string name="pref_home_wake_title">Botão home</string>
+    <string name="pref_home_wake_summary">O seu dispositivo despertará ao pressionar o botão home</string>
+    <string name="profile_trigger_connect">Ao conectar</string>
+    <string name="profile_trigger_disconnect">Ao desconectar</string>
+    <string name="profile_trigger_notrigger">Sem disparador</string>
+    <string name="profile_trigger_configure">Configurar disparador</string>
+    <string name="profile_triggers">Disparadores</string>
+    <string name="profile_trigger_filter_all">Todos disparadores</string>
+    <string name="profile_trigger_filter_wifi">Disparadores Wi-Fi</string>
+    <string name="profile_trigger_filter_bluetooth">Disparadores bluetooth</string>
+    <string name="power_notifications_enable_summary">Reproduzir um som de alerta quando conectando ou desconectando do carregador</string>
+    <string name="privacy_guard_switch_label">Ativar Proteção à Privacidade</string>
+    <string name="privacy_guard_dlg_title">Ativar Proteção à Privacidade?</string>
+    <string name="privacy_guard_dlg_text">Quando a Proteção à Privacidade estiver ativada, o aplicativo não será capaz de acessar dados pessoais como contatos, mensagens e registro de chamadas.</string>
+    <string name="privacy_guard_default_title">Proteção à Privacidade</string>
+    <string name="privacy_guard_default_summary">Ativar por padrão Proteção à Privacidade aos aplicativos novos instalados</string>
 </resources>
