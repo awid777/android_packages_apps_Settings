@@ -195,11 +195,6 @@ public class StatusBar extends SettingsPreferenceFragment implements OnPreferenc
             mPrefCategoryGeneral.removePreference(mStatusBarCmSignal);
         }
 
-	    mClockStyle = (PreferenceScreen) prefSet.findPreference("clock_style_pref");
-        if (mClockStyle != null) {
-            updateClockStyleDescription();
-        }
-
         if (Utils.isTablet(getActivity())) {
             mPrefCategoryGeneral.removePreference(mStatusBarBrightnessControl);
         }
@@ -321,21 +316,10 @@ public class StatusBar extends SettingsPreferenceFragment implements OnPreferenc
         return super.onPreferenceTreeClick(preferenceScreen, preference);
 
    }
-	
-    private void updateClockStyleDescription() {
-        if (Settings.System.getInt(getActivity().getContentResolver(),
-               Settings.System.STATUS_BAR_CLOCK, 0) == 1) {
-            mClockStyle.setSummary(getString(R.string.clock_enabled));
-        } else {
-            mClockStyle.setSummary(getString(R.string.clock_disabled));
-         }	
-
-    }
 
      @Override
     public void onResume() {
         super.onResume();
-        updateClockStyleDescription();
     }
 
      private void updateBatteryIconOptions() {
