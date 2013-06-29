@@ -293,14 +293,11 @@
     <string name="increasing_ring_interval_3seconds">3 secondi</string>
     <string name="increasing_ring_interval_5seconds">5 secondi</string>
     <string name="increasing_ring_interval_10seconds">10 secondi</string>
-<<<<<<< HEAD
-=======
     <string name="profile_trigger_configure">Configura innesco</string>
     <string name="profile_triggers">Inneschi</string>
     <string name="profile_trigger_filter_all">Tutti gli inneschi</string>
     <string name="profile_trigger_filter_wifi">Inneschi Wi-Fi</string>
     <string name="profile_trigger_filter_bluetooth">Inneschi Bluetooth</string>
->>>>>>> 0af86ec... Settings: Update italian translation
     <string name="profile_write_nfc_tag">Scrivi sull\'etichetta NFC</string>
     <string name="profile_write_touch_tag">Tocca l\'etichetta per scrivere</string>
     <string name="profile_write_success">Etichetta scritta con successo</string>
