@@ -160,6 +160,7 @@
             </intent-filter>
         </receiver>
 
+
         <!-- Settings -->
 
         <activity android:name="Settings"
