@@ -2696,7 +2696,7 @@
     <string name="app_disable_notifications_dlg_text">
         If you turn off notifications for this app, you may miss important alerts and updates.
     </string>
-
+    
     <!-- [CHAR LIMIT=25] Services settings screen, setting option name for the user to go to the screen to view app storage use -->
     <string name="storageuse_settings_title">Storage use</string>
     <!-- Services settings screen, setting option summary for the user to go to the screen to app storage use -->
@@ -4449,9 +4449,7 @@
     
     <string name="alert_reboot">Reboot needed</string>
     <string name="alert_reboot_message">This change needs a reboot to be applied. Do you want to reboot now?</string>
-
-    <string name="goo_updater">GooUpdater</string>
-
+    
     <!-- Status bar background style -->
     <string name="status_bar_transparency_title">Status bar transparency</string>
     <string name="status_bar_color_title">Status bar color</string>
@@ -4701,11 +4699,11 @@
     <string name="ram_bar_color_disabled">Disabled</string>
     <string name="ram_bar_button_help">Help</string>
     <string name="ram_bar_button_reset">Reset colors</string>
-
+    
     <!-- Auto-Hide Status Bar -->
     <string name="auto_hide_statusbar">Auto Hide statusbar</string>
     <string name="auto_hide_statusbar_summary">Statusbar hides itself when there are no notifications</string>
-
+    
     <!-- TabUI Extras Hide -->
     <string name="hide_extras">Hide extras</string>
     <string name="hide_extras_summary">Hides extra buttons in tabUI (requires UI restart)</string>
