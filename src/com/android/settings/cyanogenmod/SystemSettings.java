@@ -88,7 +88,7 @@ public class SystemSettings extends SettingsPreferenceFragment  implements
                 com.android.internal.R.bool.config_hasHardwareKeys)
             boolean removeNavbar = ExtendedPropertiesUtils.isTablet();
             // Do nothing
-            }
+            
 
             // Act on the above
             if (removeKeys) {
