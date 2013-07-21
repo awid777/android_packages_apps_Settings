@@ -84,16 +84,16 @@ public class SystemSettings extends SettingsPreferenceFragment  implements
 
             // Only show the hardware keys config on a device that does have them
             // and the navigation bar config when we're not in tabletui
-            boolean removeKeys = !getResources().getBoolean(
-                        com.android.internal.R.bool.config_hasHardwareKeys);
-            boolean removeNavbar = ExtendedPropertiesUtils.isTablet();
+            //boolean removeKeys = !getResources().getBoolean(
+            //            com.android.internal.R.bool.config_hasHardwareKeys);
+            //boolean removeNavbar = ExtendedPropertiesUtils.isTablet();
             // Do nothing
             
 
             // Act on the above
-            if (removeKeys) {
-                prefScreen.removePreference(findPreference(KEY_HARDWARE_KEYS));
-            }
+            //if (removeKeys) {
+            //    prefScreen.removePreference(findPreference(KEY_HARDWARE_KEYS));
+            //}
         } else {
             // Secondary user is logged in, remove all primary user specific preferences
             prefScreen.removePreference(findPreference(KEY_BATTERY_LIGHT));
