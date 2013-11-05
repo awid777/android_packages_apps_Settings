@@ -20,8 +20,10 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
@@ -53,6 +55,9 @@ public class SettingsPreferenceFragment extends PreferenceFragment implements Di
     private SettingsDialogFragment mDialogFragment;
 
     private String mHelpUrl;
+
+    // Cache the content resolver for async callbacks
+    private ContentResolver mContentResolver;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -110,7 +115,11 @@ public class SettingsPreferenceFragment extends PreferenceFragment implements Di
      * Returns the ContentResolver from the owning Activity.
      */
     protected ContentResolver getContentResolver() {
-        return getActivity().getContentResolver();
+        Context context = getActivity();
+        if (context != null) {
+            mContentResolver = context.getContentResolver();
+        }
+        return mContentResolver;
     }
 
     /**
@@ -239,8 +248,11 @@ public class SettingsPreferenceFragment extends PreferenceFragment implements Di
                     mParentFragment = getFragmentManager().findFragmentById(mParentFragmentId);
                     if (!(mParentFragment instanceof DialogCreatable)) {
                         throw new IllegalArgumentException(
-                                KEY_PARENT_FRAGMENT_ID + " must implement "
-                                        + DialogCreatable.class.getName());
+                                (mParentFragment != null 
+                                        ? mParentFragment.getClass().getName()
+                                        : mParentFragmentId)
+                                + " must implement "
+                                + DialogCreatable.class.getName());
                     }
                 }
                 // This dialog fragment could be created from non-SettingsPreferenceFragment
@@ -323,15 +335,31 @@ public class SettingsPreferenceFragment extends PreferenceFragment implements Di
         Matcher matcher = pattern.matcher(intentUri);
 
         String packageName = matcher.find() ? matcher.group(1) : null;
+        boolean available = true;
+
         if (packageName != null) {
             try {
-                getPackageManager().getPackageInfo(packageName, 0);
+                PackageInfo pi = getPackageManager().getPackageInfo(packageName, 0);
+                if (!pi.applicationInfo.enabled) {
+                    Log.e(TAG, "package " + packageName + " disabled, hiding preference.");
+                    available = false;
+                }
             } catch (NameNotFoundException e) {
                 Log.e(TAG, "package " + packageName + " not installed, hiding preference.");
+<<<<<<< HEAD
                 parent.removePreference(preference);
                 return true;
+=======
+                available = false;
+>>>>>>> upstream/cm-10.2
             }
         }
+
+        if (!available) {
+            parent.removePreference(preference);
+            return true;
+        }
+
         return false;
     }
 }

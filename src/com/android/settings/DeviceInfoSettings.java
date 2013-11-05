@@ -17,7 +17,9 @@
 package com.android.settings;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,6 +30,7 @@ import android.os.UserHandle;
 import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
+import android.telephony.MSimTelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -70,6 +73,7 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
     private static final String KEY_DEVICE_CPU = "device_cpu";
     private static final String KEY_DEVICE_MEMORY = "device_memory";
     private static final String KEY_CM_UPDATES = "cm_updates";
+    private static final String KEY_STATUS = "status_info";
 
     static final int TAPS_TO_BE_A_DEVELOPER = 7;
     long[] mHits = new long[3];
@@ -100,6 +104,14 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
             setStringSummary(KEY_SELINUX_STATUS, status);
         }
         findPreference(KEY_SELINUX_STATUS).setEnabled(true);
+<<<<<<< HEAD
+=======
+
+        if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
+            findPreference(KEY_STATUS).getIntent().setClassName(
+                    "com.android.settings","com.android.settings.deviceinfo.msim.MSimStatus");
+        }
+>>>>>>> upstream/cm-10.2
 
         // Remove selinux information if property is not present
         removePreferenceIfPropertyMissing(getPreferenceScreen(), KEY_SELINUX_STATUS,
@@ -129,7 +141,8 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
                 PROPERTY_EQUIPMENT_ID);
 
         // Remove Baseband version if wifi-only device
-        if (Utils.isWifiOnly(getActivity())) {
+        if (Utils.isWifiOnly(getActivity())
+                || (MSimTelephonyManager.getDefault().isMultiSimEnabled())) {
             getPreferenceScreen().removePreference(findPreference(KEY_BASEBAND_VERSION));
         }
 
@@ -196,38 +209,38 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
                 }
             }
         } else if (preference.getKey().equals(KEY_BUILD_NUMBER)) {
-            // Only allow the owner of the device to turn on dev and performance options
-            if (UserHandle.myUserId() == UserHandle.USER_OWNER) {
-                if (mDevHitCountdown > 0) {
-                    mDevHitCountdown--;
-                    if (mDevHitCountdown == 0) {
-                        getActivity().getSharedPreferences(DevelopmentSettings.PREF_FILE,
-                                Context.MODE_PRIVATE).edit().putBoolean(
-                                        DevelopmentSettings.PREF_SHOW, true).apply();
-                        if (mDevHitToast != null) {
-                            mDevHitToast.cancel();
-                        }
-                        mDevHitToast = Toast.makeText(getActivity(), R.string.show_dev_on,
-                                Toast.LENGTH_LONG);
-                        mDevHitToast.show();
-                    } else if (mDevHitCountdown > 0
-                            && mDevHitCountdown < (TAPS_TO_BE_A_DEVELOPER-2)) {
-                        if (mDevHitToast != null) {
-                            mDevHitToast.cancel();
-                        }
-                        mDevHitToast = Toast.makeText(getActivity(), getResources().getQuantityString(
-                                R.plurals.show_dev_countdown, mDevHitCountdown, mDevHitCountdown),
-                                Toast.LENGTH_SHORT);
-                        mDevHitToast.show();
-                    }
-                } else if (mDevHitCountdown < 0) {
+            // Don't enable developer options for secondary users.
+            if (UserHandle.myUserId() != UserHandle.USER_OWNER) return true;
+
+            if (mDevHitCountdown > 0) {
+                mDevHitCountdown--;
+                if (mDevHitCountdown == 0) {
+                    getActivity().getSharedPreferences(DevelopmentSettings.PREF_FILE,
+                            Context.MODE_PRIVATE).edit().putBoolean(
+                                    DevelopmentSettings.PREF_SHOW, true).apply();
                     if (mDevHitToast != null) {
                         mDevHitToast.cancel();
                     }
-                    mDevHitToast = Toast.makeText(getActivity(), R.string.show_dev_already,
+                    mDevHitToast = Toast.makeText(getActivity(), R.string.show_dev_on,
                             Toast.LENGTH_LONG);
                     mDevHitToast.show();
+                } else if (mDevHitCountdown > 0
+                        && mDevHitCountdown < (TAPS_TO_BE_A_DEVELOPER-2)) {
+                    if (mDevHitToast != null) {
+                        mDevHitToast.cancel();
+                    }
+                    mDevHitToast = Toast.makeText(getActivity(), getResources().getQuantityString(
+                            R.plurals.show_dev_countdown, mDevHitCountdown, mDevHitCountdown),
+                            Toast.LENGTH_SHORT);
+                    mDevHitToast.show();
                 }
+            } else if (mDevHitCountdown < 0) {
+                if (mDevHitToast != null) {
+                    mDevHitToast.cancel();
+                }
+                mDevHitToast = Toast.makeText(getActivity(), R.string.show_dev_already,
+                        Toast.LENGTH_LONG);
+                mDevHitToast.show();
             }
         } else if (preference.getKey().equals(KEY_MOD_VERSION)) {
             System.arraycopy(mHits, 1, mHits, 0, mHits.length-1);
@@ -247,6 +260,7 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
             System.arraycopy(mHits, 1, mHits, 0, mHits.length-1);
             mHits[mHits.length-1] = SystemClock.uptimeMillis();
             if (mHits[0] >= (SystemClock.uptimeMillis()-500)) {
+<<<<<<< HEAD
                     SELinux.setSELinuxEnforce(!SELinux.isSELinuxEnforced());
                     if (!SELinux.isSELinuxEnabled()) {
                             String status = getResources().getString(R.string.selinux_status_disabled);
@@ -258,6 +272,52 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
                             String status = getResources().getString(R.string.selinux_status_enforcing);
                             setStringSummary(KEY_SELINUX_STATUS, status);
                     }
+=======
+                if (SELinux.isSELinuxEnabled()) {
+                    if (!SELinux.isSELinuxEnforced()) {
+                        /* Display the warning dialog */
+                        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+                        alertDialog.setTitle(R.string.selinux_enable_title);
+                        alertDialog.setMessage(getResources()
+                            .getString(R.string.selinux_enable_warning));
+                        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE,
+                            getResources().getString(com.android.internal.R.string.ok),
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    SELinux.setSELinuxEnforce(true);
+                                    String status = getResources()
+                                        .getString(R.string.selinux_status_enforcing);
+                                    setStringSummary(KEY_SELINUX_STATUS, status);
+                                }
+                            });
+                        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE,
+                            getResources().getString(com.android.internal.R.string.cancel),
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            });
+                        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            public void onCancel(DialogInterface dialog) {
+                            }
+                        });
+                        alertDialog.show();
+
+                    } else {
+                        SELinux.setSELinuxEnforce(false);
+                    }
+                }
+
+                if (!SELinux.isSELinuxEnabled()) {
+                    String status = getResources().getString(R.string.selinux_status_disabled);
+                    setStringSummary(KEY_SELINUX_STATUS, status);
+                } else if (!SELinux.isSELinuxEnforced()) {
+                    String status = getResources().getString(R.string.selinux_status_permissive);
+                    setStringSummary(KEY_SELINUX_STATUS, status);
+                } else if (SELinux.isSELinuxEnforced()) {
+                    String status = getResources().getString(R.string.selinux_status_enforcing);
+                    setStringSummary(KEY_SELINUX_STATUS, status);
+                }
+>>>>>>> upstream/cm-10.2
             }
         }
         return super.onPreferenceTreeClick(preferenceScreen, preference);

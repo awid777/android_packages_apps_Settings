@@ -29,6 +29,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -62,11 +63,14 @@ public class LockscreenInterface extends SettingsPreferenceFragment implements
     private static final int LOCKSCREEN_BACKGROUND_CUSTOM_IMAGE = 1;
     private static final int LOCKSCREEN_BACKGROUND_DEFAULT_WALLPAPER = 2;
 
-    private static final String KEY_ALWAYS_BATTERY = "lockscreen_battery_status";
+    private static final String KEY_BATTERY_STATUS = "lockscreen_battery_status";
     private static final String KEY_LOCKSCREEN_BUTTONS = "lockscreen_buttons";
     private static final String KEY_LOCK_CLOCK = "lock_clock";
+<<<<<<< HEAD
     private static final String KEY_LOCKSCREEN_MAXIMIZE_WIDGETS = "lockscreen_maximize_widgets";
     private static final String KEY_LOCKSCREEN_MUSIC_CONTROLS = "lockscreen_music_controls";
+=======
+>>>>>>> upstream/cm-10.2
     private static final String KEY_BACKGROUND = "lockscreen_background";
     private static final String KEY_SCREEN_SECURITY = "screen_security";
     private static final String PREF_LOCKSCREEN_AUTO_ROTATE = "lockscreen_auto_rotate";
@@ -76,11 +80,19 @@ public class LockscreenInterface extends SettingsPreferenceFragment implements
     private static final String KEY_LOCKSCREEN_ENABLE_WIDGETS = "lockscreen_enable_widgets";
     private static final String KEY_LOCKSCREEN_ENABLE_CAMERA = "lockscreen_enable_camera";
 
+    private static final String LOCKSCREEN_GENERAL_CATEGORY = "lockscreen_general_category";
+    private static final String LOCKSCREEN_WIDGETS_CATEGORY = "lockscreen_widgets_category";
+    private static final String KEY_LOCKSCREEN_ENABLE_WIDGETS = "lockscreen_enable_widgets";
+    private static final String KEY_LOCKSCREEN_ENABLE_CAMERA = "lockscreen_enable_camera";
+
     private ListPreference mCustomBackground;
     private ListPreference mBatteryStatus;
+<<<<<<< HEAD
     private CheckBoxPreference mMaximizeWidgets;
     private CheckBoxPreference mLockscreenAutoRotate;
     private CheckBoxPreference mMusicControls;
+=======
+>>>>>>> upstream/cm-10.2
     private CheckBoxPreference mEnableWidgets;
     private CheckBoxPreference mEnableCamera;
 
@@ -106,17 +118,23 @@ public class LockscreenInterface extends SettingsPreferenceFragment implements
         mIsPrimary = UserHandle.myUserId() == UserHandle.USER_OWNER;
         if (mIsPrimary) {
             // Its the primary user, show all the settings
-            mBatteryStatus = (ListPreference) findPreference(KEY_ALWAYS_BATTERY);
+            mBatteryStatus = (ListPreference) findPreference(KEY_BATTERY_STATUS);
             if (mBatteryStatus != null) {
                 mBatteryStatus.setOnPreferenceChangeListener(this);
             }
 
+<<<<<<< HEAD
             mMaximizeWidgets = (CheckBoxPreference) findPreference(KEY_LOCKSCREEN_MAXIMIZE_WIDGETS);
             if (!Utils.isPhone(getActivity())) {
                 widgetsCategory.removePreference(mMaximizeWidgets);
                 mMaximizeWidgets = null;
             } else {
                 mMaximizeWidgets.setOnPreferenceChangeListener(this);
+=======
+            if (!Utils.isPhone(getActivity())) {
+                widgetsCategory.removePreference(
+                        findPreference(Settings.System.LOCKSCREEN_MAXIMIZE_WIDGETS));
+>>>>>>> upstream/cm-10.2
             }
 
             mMusicControls = (CheckBoxPreference) findPreference(KEY_LOCKSCREEN_MUSIC_CONTROLS);
@@ -129,8 +147,14 @@ public class LockscreenInterface extends SettingsPreferenceFragment implements
         } else {
             // Secondary user is logged in, remove all primary user specific preferences
             generalCategory.removePreference(findPreference(KEY_SCREEN_SECURITY));
+<<<<<<< HEAD
             widgetsCategory.removePreference(findPreference(KEY_LOCKSCREEN_MAXIMIZE_WIDGETS));
             generalCategory.removePreference(findPreference(KEY_ALWAYS_BATTERY));
+=======
+            widgetsCategory.removePreference(
+                    findPreference(Settings.System.LOCKSCREEN_MAXIMIZE_WIDGETS));
+            generalCategory.removePreference(findPreference(KEY_BATTERY_STATUS));
+>>>>>>> upstream/cm-10.2
             generalCategory.removePreference(findPreference(KEY_LOCKSCREEN_BUTTONS));
         }
 
@@ -150,6 +174,14 @@ public class LockscreenInterface extends SettingsPreferenceFragment implements
         mEnableWidgets.setChecked((disabledFeatures & DevicePolicyManager.KEYGUARD_DISABLE_WIDGETS_ALL) == 0);
         mEnableCamera.setChecked((disabledFeatures & DevicePolicyManager.KEYGUARD_DISABLE_SECURE_CAMERA) == 0);
 
+<<<<<<< HEAD
+=======
+        // Remove the camera widget preference if the device doesn't have one
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+            widgetsCategory.removePreference(mEnableCamera);
+        }
+
+>>>>>>> upstream/cm-10.2
         mWallpaperImage = new File(getActivity().getFilesDir() + "/lockwallpaper");
         mWallpaperTemporary = new File(getActivity().getCacheDir() + "/lockwallpaper.tmp");
 
@@ -188,8 +220,9 @@ public class LockscreenInterface extends SettingsPreferenceFragment implements
     public void onResume() {
         super.onResume();
 
-        if (mIsPrimary) {
+        if (mIsPrimary && mBatteryStatus != null) {
             ContentResolver cr = getActivity().getContentResolver();
+<<<<<<< HEAD
             if (mBatteryStatus != null) {
                 int batteryStatus = Settings.System.getInt(cr,
                         Settings.System.LOCKSCREEN_ALWAYS_SHOW_BATTERY, 0);
@@ -205,6 +238,12 @@ public class LockscreenInterface extends SettingsPreferenceFragment implements
                 mMusicControls.setChecked(Settings.System.getInt(cr,
                         Settings.System.LOCKSCREEN_MUSIC_CONTROLS, 1) == 1);
             }
+=======
+            int batteryStatus = Settings.System.getInt(cr,
+                    Settings.System.LOCKSCREEN_BATTERY_VISIBILITY, 0);
+            mBatteryStatus.setValueIndex(batteryStatus);
+            mBatteryStatus.setSummary(mBatteryStatus.getEntries()[batteryStatus]);
+>>>>>>> upstream/cm-10.2
         }
     }
 
@@ -240,9 +279,10 @@ public class LockscreenInterface extends SettingsPreferenceFragment implements
         if (preference == mBatteryStatus) {
             int value = Integer.valueOf((String) objValue);
             int index = mBatteryStatus.findIndexOfValue((String) objValue);
-            Settings.System.putInt(cr, Settings.System.LOCKSCREEN_ALWAYS_SHOW_BATTERY, value);
+            Settings.System.putInt(cr, Settings.System.LOCKSCREEN_BATTERY_VISIBILITY, value);
             mBatteryStatus.setSummary(mBatteryStatus.getEntries()[index]);
             return true;
+<<<<<<< HEAD
         } else if (preference == mMaximizeWidgets) {
             boolean value = (Boolean) objValue;
             Settings.System.putInt(cr, Settings.System.LOCKSCREEN_MAXIMIZE_WIDGETS, value ? 1 : 0);
@@ -254,6 +294,8 @@ public class LockscreenInterface extends SettingsPreferenceFragment implements
             boolean value = (Boolean) objValue;
             Settings.System.putInt(cr, Settings.System.LOCKSCREEN_MUSIC_CONTROLS, value ? 1 : 0);
             return true;
+=======
+>>>>>>> upstream/cm-10.2
         } else if (preference == mCustomBackground) {
             int selection = mCustomBackground.findIndexOfValue(objValue.toString());
             return handleBackgroundSelection(selection);
@@ -267,6 +309,19 @@ public class LockscreenInterface extends SettingsPreferenceFragment implements
 
         return false;
         
+    }
+
+    private void updateKeyguardState(boolean enableCamera, boolean enableWidgets) {
+        ComponentName dpmAdminName = new ComponentName(getActivity(),
+                DeviceAdminLockscreenReceiver.class);
+        mDPM.setActiveAdmin(dpmAdminName, true);
+        int disabledFeatures = enableWidgets
+                ? DevicePolicyManager.KEYGUARD_DISABLE_FEATURES_NONE
+                : DevicePolicyManager.KEYGUARD_DISABLE_WIDGETS_ALL;
+        if (!enableCamera) {
+            disabledFeatures |= DevicePolicyManager.KEYGUARD_DISABLE_SECURE_CAMERA;
+        }
+        mDPM.setKeyguardDisabledFeatures(dpmAdminName, disabledFeatures);
     }
 
     private void updateKeyguardState(boolean enableCamera, boolean enableWidgets) {

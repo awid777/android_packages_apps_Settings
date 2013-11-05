@@ -21,6 +21,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -35,11 +36,14 @@ import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.provider.Telephony;
+import android.telephony.MSimTelephonyManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.provider.Settings;
+import android.provider.Settings.SettingNotFoundException;
 
 import com.android.internal.telephony.Phone;
 import com.android.internal.telephony.PhoneConstants;
@@ -61,6 +65,7 @@ public class ApnEditor extends SettingsPreferenceFragment
     private final static String KEY_BEARER = "bearer";
     protected static final String EDIT_ACTION = "edit_action";
     protected static final String EDIT_DATA = "edit_data";
+    private final static String KEY_MVNO_TYPE = "mvno_type";
 
     private static final int MENU_DELETE = Menu.FIRST;
     private static final int MENU_SAVE = Menu.FIRST + 1;
@@ -86,15 +91,19 @@ public class ApnEditor extends SettingsPreferenceFragment
     private ListPreference mRoamingProtocol;
     private CheckBoxPreference mCarrierEnabled;
     private ListPreference mBearer;
+    private ListPreference mMvnoType;
+    private EditTextPreference mMvnoMatchData;
 
     private String mCurMnc;
     private String mCurMcc;
+    private int mSubscription = 0;
 
     private Uri mUri;
     private Cursor mCursor;
     private boolean mNewApn;
     private boolean mFirstTime;
     private Resources mRes;
+    private TelephonyManager mTelephonyManager;
 
     /**
      * Standard projection for the interesting columns of a normal note.
@@ -119,7 +128,9 @@ public class ApnEditor extends SettingsPreferenceFragment
             Telephony.Carriers.PROTOCOL, // 16
             Telephony.Carriers.CARRIER_ENABLED, // 17
             Telephony.Carriers.BEARER, // 18
-            Telephony.Carriers.ROAMING_PROTOCOL // 19
+            Telephony.Carriers.ROAMING_PROTOCOL, // 19
+            Telephony.Carriers.MVNO_TYPE,   // 20
+            Telephony.Carriers.MVNO_MATCH_DATA  // 21
     };
 
     private static final int ID_INDEX = 0;
@@ -141,6 +152,8 @@ public class ApnEditor extends SettingsPreferenceFragment
     private static final int CARRIER_ENABLED_INDEX = 17;
     private static final int BEARER_INDEX = 18;
     private static final int ROAMING_PROTOCOL_INDEX = 19;
+    private static final int MVNO_TYPE_INDEX = 20;
+    private static final int MVNO_MATCH_DATA_INDEX = 21;
 
 
     @Override
@@ -178,6 +191,10 @@ public class ApnEditor extends SettingsPreferenceFragment
         mBearer = (ListPreference) findPreference(KEY_BEARER);
         mBearer.setOnPreferenceChangeListener(this);
 
+        mMvnoType = (ListPreference) findPreference(KEY_MVNO_TYPE);
+        mMvnoType.setOnPreferenceChangeListener(this);
+        mMvnoMatchData = (EditTextPreference) findPreference("mvno_match_data");
+
         mRes = getResources();
 
         final Intent intent = getActivity().getIntent();
@@ -191,6 +208,10 @@ public class ApnEditor extends SettingsPreferenceFragment
             mUri = intent.getData();
         }
 
+        // Read the subscription received from Phone settings.
+        mSubscription = intent.getIntExtra(SelectSubscription.SUBSCRIPTION_KEY,
+                MSimTelephonyManager.getDefault().getDefaultSubscription());
+        Log.d(TAG,"ApnEditor onCreate received sub: " + mSubscription);
         mFirstTime = icicle == null;
 
         if (action.equals(Intent.ACTION_INSERT)) {
@@ -224,7 +245,9 @@ public class ApnEditor extends SettingsPreferenceFragment
         mCursor = qCursor.loadInBackground();
         mCursor.moveToFirst();
 
-        fillUi();
+        mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
+        fillUi(intent.getStringExtra(ApnSettings.OPERATOR_NUMERIC_EXTRA));
         setHasOptionsMenu(true);
     }
 
@@ -242,7 +265,7 @@ public class ApnEditor extends SettingsPreferenceFragment
         super.onPause();
     }
 
-    private void fillUi() {
+    private void fillUi(String defaultOperatorNumeric) {
         if (mFirstTime) {
             mFirstTime = false;
             // Fill in all the values from the db in both text editor and summary
@@ -260,14 +283,12 @@ public class ApnEditor extends SettingsPreferenceFragment
             mMnc.setText(mCursor.getString(MNC_INDEX));
             mApnType.setText(mCursor.getString(TYPE_INDEX));
             if (mNewApn) {
-                String numeric =
-                    SystemProperties.get(TelephonyProperties.PROPERTY_ICC_OPERATOR_NUMERIC);
                 // MCC is first 3 chars and then in 2 - 3 chars of MNC
-                if (numeric != null && numeric.length() > 4) {
+                if (defaultOperatorNumeric != null && defaultOperatorNumeric.length() > 4) {
                     // Country code
-                    String mcc = numeric.substring(0, 3);
+                    String mcc = defaultOperatorNumeric.substring(0, 3);
                     // Network code
-                    String mnc = numeric.substring(3);
+                    String mnc = defaultOperatorNumeric.substring(3);
                     // Auto populate MNC and MCC for new entries, based on what SIM reports
                     mMcc.setText(mcc);
                     mMnc.setText(mnc);
@@ -286,6 +307,9 @@ public class ApnEditor extends SettingsPreferenceFragment
             mRoamingProtocol.setValue(mCursor.getString(ROAMING_PROTOCOL_INDEX));
             mCarrierEnabled.setChecked(mCursor.getInt(CARRIER_ENABLED_INDEX)==1);
             mBearer.setValue(mCursor.getString(BEARER_INDEX));
+            mMvnoType.setValue(mCursor.getString(MVNO_TYPE_INDEX));
+            mMvnoMatchData.setEnabled(false);
+            mMvnoMatchData.setText(mCursor.getString(MVNO_MATCH_DATA_INDEX));
         }
 
         mName.setSummary(checkNull(mName.getText()));
@@ -319,6 +343,9 @@ public class ApnEditor extends SettingsPreferenceFragment
                 checkNull(protocolDescription(mRoamingProtocol.getValue(), mRoamingProtocol)));
         mBearer.setSummary(
                 checkNull(bearerDescription(mBearer.getValue())));
+        mMvnoType.setSummary(
+                checkNull(mvnoDescription(mMvnoType.getValue())));
+        mMvnoMatchData.setSummary(checkNull(mMvnoMatchData.getText()));
     }
 
     /**
@@ -348,6 +375,39 @@ public class ApnEditor extends SettingsPreferenceFragment
             String[] values = mRes.getStringArray(R.array.bearer_entries);
             try {
                 return values[mBearerIndex];
+            } catch (ArrayIndexOutOfBoundsException e) {
+                return null;
+            }
+        }
+    }
+
+    private String mvnoDescription(String newValue) {
+        int mvnoIndex = mMvnoType.findIndexOfValue(newValue);
+        String oldValue = mMvnoType.getValue();
+
+        if (mvnoIndex == -1) {
+            return null;
+        } else {
+            String[] values = mRes.getStringArray(R.array.mvno_type_entries);
+            if (values[mvnoIndex].equals("None")) {
+                mMvnoMatchData.setEnabled(false);
+            } else {
+                mMvnoMatchData.setEnabled(true);
+            }
+            if (newValue != null && newValue.equals(oldValue) == false) {
+                if (values[mvnoIndex].equals("SPN")) {
+                    mMvnoMatchData.setText(mTelephonyManager.getSimOperatorName());
+                } else if (values[mvnoIndex].equals("IMSI")) {
+                    String numeric =
+                            SystemProperties.get(TelephonyProperties.PROPERTY_ICC_OPERATOR_NUMERIC);
+                    mMvnoMatchData.setText(numeric + "x");
+                } else if (values[mvnoIndex].equals("GID")) {
+                    mMvnoMatchData.setText(mTelephonyManager.getGroupIdLevel1());
+                }
+            }
+
+            try {
+                return values[mvnoIndex];
             } catch (ArrayIndexOutOfBoundsException e) {
                 return null;
             }
@@ -387,6 +447,13 @@ public class ApnEditor extends SettingsPreferenceFragment
             }
             mBearer.setValue((String) newValue);
             mBearer.setSummary(bearer);
+        } else if (KEY_MVNO_TYPE.equals(key)) {
+            String mvno = mvnoDescription((String) newValue);
+            if (mvno == null) {
+                return false;
+            }
+            mMvnoType.setValue((String) newValue);
+            mMvnoType.setSummary(mvno);
         }
 
         return true;
@@ -446,6 +513,7 @@ public class ApnEditor extends SettingsPreferenceFragment
         String apn = checkNotSet(mApn.getText());
         String mcc = checkNotSet(mMcc.getText());
         String mnc = checkNotSet(mMnc.getText());
+        int dataSub = 0;
 
         if (getErrorMsg() != null && !force) {
             showDialog(ERROR_DIALOG_ID);
@@ -495,8 +563,19 @@ public class ApnEditor extends SettingsPreferenceFragment
 
         values.put(Telephony.Carriers.NUMERIC, mcc + mnc);
 
+        try {
+            dataSub = Settings.Global.getInt(getContentResolver(),
+                    Settings.Global.MULTI_SIM_DATA_CALL_SUBSCRIPTION);
+        } catch (SettingNotFoundException snfe) {
+            // Exception Reading Multi Sim Data Subscription Value
+            if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
+               Log.e(TAG, "Exception Reading Multi Sim Data Subscription Value.", snfe);
+            }
+        }
+
         if (mCurMnc != null && mCurMcc != null) {
-            if (mCurMnc.equals(mnc) && mCurMcc.equals(mcc)) {
+            if (mCurMnc.equals(mnc) && mCurMcc.equals(mcc) &&
+                    mSubscription == dataSub ) {
                 values.put(Telephony.Carriers.CURRENT, 1);
             }
         }
@@ -505,6 +584,9 @@ public class ApnEditor extends SettingsPreferenceFragment
         if (bearerVal != null) {
             values.put(Telephony.Carriers.BEARER, Integer.parseInt(bearerVal));
         }
+
+        values.put(Telephony.Carriers.MVNO_TYPE, checkNotSet(mMvnoType.getValue()));
+        values.put(Telephony.Carriers.MVNO_MATCH_DATA, checkNotSet(mMvnoMatchData.getText()));
 
         getContentResolver().update(mUri, values, null, null);
 

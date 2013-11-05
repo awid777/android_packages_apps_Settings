@@ -17,11 +17,18 @@
     xmlns:settings="http://schemas.android.com/apk/res/com.android.settings"
     android:title="@string/themes_settings_title" >
 
+<<<<<<< HEAD
 
     <PreferenceCategory
         android:title="@string/title_general"
         android:key="lockscreen_general_category" >
 
+=======
+    <PreferenceCategory
+        android:title="@string/title_general"
+        android:key="lockscreen_general_category" >
+
+>>>>>>> upstream/cm-10.2
         <PreferenceScreen
             android:key="screen_security"
             android:fragment="com.android.settings.SecuritySettings"
@@ -58,11 +65,14 @@
             android:key="lockscreen_buttons"
             android:title="@string/lockscreen_buttons_title"
             android:summary="@string/lockscreen_buttons_summary" />
+<<<<<<< HEAD
         
         <CheckBoxPreference
             android:key="lockscreen_auto_rotate"
             android:title="@string/lockscreen_auto_rotate_title"
             android:summary="@string/lockscreen_auto_rotate_summary" />
+=======
+>>>>>>> upstream/cm-10.2
 
     </PreferenceCategory>
 
@@ -81,9 +91,14 @@
                 android:targetPackage="com.cyanogenmod.lockclock" />
         </PreferenceScreen>
 
+<<<<<<< HEAD
         <CheckBoxPreference
             android:key="lockscreen_maximize_widgets"
             android:persistent="false"
+=======
+        <com.android.settings.cyanogenmod.SystemSettingCheckBoxPreference
+            android:key="lockscreen_maximize_widgets"
+>>>>>>> upstream/cm-10.2
             android:summary="@string/lockscreen_maximize_widgets_summary"
             android:title="@string/lockscreen_maximize_widgets_title" />
 
@@ -99,11 +114,19 @@
             android:title="@string/lockscreen_enable_camera_title"
             android:summary="@string/lockscreen_enable_camera_summary" />
 
+<<<<<<< HEAD
         <CheckBoxPreference
             android:key="lockscreen_music_controls"
             android:persistent="false"
             android:title="@string/lockscreen_music_controls_title"
             android:summary="@string/lockscreen_music_controls_summary" />
+=======
+        <com.android.settings.cyanogenmod.SystemSettingCheckBoxPreference
+            android:key="lockscreen_music_controls"
+            android:title="@string/lockscreen_music_controls_title"
+            android:summary="@string/lockscreen_music_controls_summary"
+            android:defaultValue="true" />
+>>>>>>> upstream/cm-10.2
 
     </PreferenceCategory>
 </PreferenceScreen>

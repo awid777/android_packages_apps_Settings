@@ -25,6 +25,7 @@ import com.android.settings.applications.ApplicationsState.AppEntry;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.AppOpsManager;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
@@ -67,6 +68,7 @@ import android.util.Log;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -143,6 +145,7 @@ public class InstalledAppDetails extends Fragment
     private CompoundButton mPrivacyGuardSwitch;
 
     private PackageMoveObserver mPackageMoveObserver;
+    private AppOpsManager mAppOps;
 
     private boolean mDisableAfterUninstall;
 
@@ -387,7 +390,8 @@ public class InstalledAppDetails extends Fragment
                 ServiceManager.getService(Context.NOTIFICATION_SERVICE));
         boolean enabled = true; // default on
         try {
-            enabled = nm.areNotificationsEnabledForPackage(mAppEntry.info.packageName);
+            enabled = nm.areNotificationsEnabledForPackage(mAppEntry.info.packageName,
+                    mAppEntry.info.uid);
         } catch (android.os.RemoteException ex) {
             // this does not bode well
         }
@@ -404,6 +408,7 @@ public class InstalledAppDetails extends Fragment
         if (mPrivacyGuardSwitch == null) {
             return;
         }
+<<<<<<< HEAD
 
         mPrivacyGuardSwitch.setChecked(mPm.getPrivacyGuardSetting(mAppEntry.info.packageName));
 
@@ -414,6 +419,13 @@ public class InstalledAppDetails extends Fragment
         } else {
             mPrivacyGuardSwitch.setOnCheckedChangeListener(this);
         }
+=======
+        mAppOps = (AppOpsManager)getActivity().getSystemService(Context.APP_OPS_SERVICE);
+        boolean isEnabled = mAppOps.getPrivacyGuardSettingForPackage(
+            mAppEntry.info.uid, mAppEntry.info.packageName);
+        mPrivacyGuardSwitch.setChecked(isEnabled);
+        mPrivacyGuardSwitch.setOnCheckedChangeListener(this);
+>>>>>>> upstream/cm-10.2
     }
 
     /** Called when the activity is first created. */
@@ -557,10 +569,10 @@ public class InstalledAppDetails extends Fragment
         }
     }
 
-    // Utility method to set applicaiton label and icon.
+    // Utility method to set application label and icon.
     private void setAppLabelAndIcon(PackageInfo pkgInfo) {
         final View appSnippet = mRootView.findViewById(R.id.app_snippet);
-        appSnippet.setPadding(0, appSnippet.getPaddingTop(), 0, appSnippet.getPaddingBottom());
+        appSnippet.setPaddingRelative(0, appSnippet.getPaddingTop(), 0, appSnippet.getPaddingBottom());
 
         ImageView icon = (ImageView) appSnippet.findViewById(R.id.app_icon);
         mState.ensureIcon(mAppEntry);
@@ -791,7 +803,7 @@ public class InstalledAppDetails extends Fragment
             LinearLayout securityList = (LinearLayout) permsView.findViewById(
                     R.id.security_settings_list);
             securityList.removeAllViews();
-            securityList.addView(asp.getPermissionsView());
+            securityList.addView(asp.getPermissionsViewWithRevokeButtons());
             // If this app is running under a shared user ID with other apps,
             // update the description to explain this.
             String[] packages = mPm.getPackagesForUid(mPackageInfo.applicationInfo.uid);
@@ -1332,15 +1344,20 @@ public class InstalledAppDetails extends Fragment
                 ServiceManager.getService(Context.NOTIFICATION_SERVICE));
         try {
             final boolean enable = mNotificationSwitch.isChecked();
-            nm.setNotificationsEnabledForPackage(packageName, enabled);
+            nm.setNotificationsEnabledForPackage(packageName, mAppEntry.info.uid, enabled);
         } catch (android.os.RemoteException ex) {
             mNotificationSwitch.setChecked(!enabled); // revert
         }
     }
 
     private void setPrivacyGuard(boolean enabled) {
+<<<<<<< HEAD
         String packageName = mAppEntry.info.packageName;
         mPm.setPrivacyGuardSetting(packageName, enabled);
+=======
+        mAppOps.setPrivacyGuardSettingForPackage(
+            mAppEntry.info.uid, mAppEntry.info.packageName, enabled);
+>>>>>>> upstream/cm-10.2
     }
 
     private int getPremiumSmsPermission(String packageName) {

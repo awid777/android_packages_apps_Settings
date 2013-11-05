@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2013 The CyanogenMod Project
+<!--
+     Copyright (C) 2013 The CyanogenMod Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -13,7 +14,6 @@
      See the License for the specific language governing permissions and
      limitations under the License.
  -->
-
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string-array name="volume_overlay_entries">
         <item>Enkelvoudig</item>
@@ -35,15 +35,18 @@
     <string-array name="profile_connection_entries">
         <item>Uitschakelen</item>
         <item>Inschakelen</item>
+<<<<<<< HEAD
     </string-array>
     <string-array name="entries_network_widget">
         <item>2G, 2G+3G</item>
         <item>2G, 3G</item>
         <item>2G, 3G, 3G+2G</item>
+=======
+>>>>>>> upstream/cm-10.2
     </string-array>
     <string-array name="entries_screentimeout_widget">
-        <item>15 sec., 1 min., 5 min.</item>
-        <item>30 sec., 2 min., 5 min.</item>
+        <item>15 sec, 1 min, 5 min</item>
+        <item>30 sec, 2 min, 5 min</item>
     </string-array>
     <string-array name="entries_flash_widget">
         <item>Normaal</item>
@@ -73,4 +76,3 @@
         <item>Brazilië</item>
     </string-array>
 </resources>
-

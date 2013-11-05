@@ -15,6 +15,7 @@
 -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+<<<<<<< HEAD
     <item android:id="@+id/help"
           android:title="@string/privacy_guard_help_title" />
     <item android:id="@+id/reset"
@@ -25,4 +26,17 @@
     <item android:id="@+id/show_system_apps"
           android:title="@string/privacy_guard_manager_show_system_apps"
           android:checkable="true" />
+=======
+    <item android:id="@+id/reset"
+          android:showAsAction="always"
+          android:icon="@drawable/ic_settings_backup"
+          android:title="@string/privacy_guard_reset_title" />
+    <item android:id="@+id/advanced"
+          android:title="@string/advanced_settings_title" />
+    <item android:id="@+id/show_system_apps"
+          android:title="@string/privacy_guard_manager_show_system_apps"
+          android:checkable="true" />
+    <item android:id="@+id/help"
+          android:title="@string/privacy_guard_help_title" />
+>>>>>>> upstream/cm-10.2
 </menu>

@@ -24,6 +24,8 @@ import android.os.SystemProperties;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.android.settings.DisplaySettings;
+import com.android.settings.LocationSettings;
 import com.android.settings.R;
 import com.android.settings.Utils;
 
@@ -65,6 +67,13 @@ public class BootReceiver extends BroadcastReceiver {
                 SystemProperties.set(KSM_SETTINGS_PROP, "false");
             }
         }
+
+        /* Restore the hardware tunable values */
+        DisplayColor.restore(ctx);
+        DisplayGamma.restore(ctx);
+        VibratorIntensity.restore(ctx);
+        DisplaySettings.restore(ctx);
+        LocationSettings.restore(ctx);
     }
 
     private void initFreqCapFiles(Context ctx)
@@ -79,7 +88,7 @@ public class BootReceiver extends BroadcastReceiver {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
 
         if (prefs.getBoolean(Processor.SOB_PREF, false) == false) {
-            Log.i(TAG, "Restore disabled by user preference.");
+            Log.i(TAG, "CPU restore disabled by user preference.");
             return;
         }
 
@@ -120,7 +129,7 @@ public class BootReceiver extends BroadcastReceiver {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
 
         if (prefs.getBoolean(IOScheduler.SOB_PREF, false) == false) {
-            Log.i(TAG, "Restore disabled by user preference.");
+            Log.i(TAG, "IOSched restore disabled by user preference.");
             return;
         }
 

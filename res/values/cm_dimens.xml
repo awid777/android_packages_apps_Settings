@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012-2013 The CyanogenMod Project
+<!--
+     Copyright (C) 2012-2013 The CyanogenMod Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -14,12 +15,9 @@
      limitations under the License.
 -->
 <resources>
-    <!-- Light settings dialog -->
-    <dimen name="dialog_light_settings_width">400dip</dimen>
-
-    <!-- height of a normal list item in edit playlist mode -->
+    <!-- Height of a normal list item in edit playlist mode -->
     <dimen name="normal_height">64dip</dimen>
-    <!-- height of an expanded list item in edit playlist mode -->
+    <!-- Height of an expanded list item in edit playlist mode -->
     <dimen name="expanded_height">128dip</dimen>
 
     <!-- Default distance beyond which snaps to the matching target -->
@@ -28,8 +26,6 @@
     <dimen name="navbar_search_outerring_radius">170dp</dimen>
     <!-- Diameter of outer shape drawable shown in navbar search-->
     <dimen name="navbar_search_outerring_diameter">340dp</dimen>
-    <!-- Height of search panel including navigation bar height -->
-    <dimen name="navbar_search_panel_height">230dip</dimen>
 
     <dimen name="auto_brightness_preview_text_size">8dip</dimen>
     <dimen name="auto_brightness_preview_stroke_width">1dip</dimen>
